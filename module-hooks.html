@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<body>
+<style>
+li {
+	cursor: pointer;
+	user-select: none;
+}
+
+.done {
+	text-decoration: line-through;
+}
+</style>
+
+<script type="module">
+import { html, Component, render, useState } from 'https://unpkg.com/htm/preact/standalone.module.js';
+
+const App = ({ page }) => {
+	const [todos, setTodos] = useState([]);
+	const [itemText, setItemText] = useState(null);
+	
+	function addTodo(text = 'New todo list item') {
+		setTodos(todos.concat({ text, done: false }));
+		setItemText(null);
+	}
+	
+	function toggleTodo(todo, index) {
+		todo.done = !todo.done;
+		const newTodos = [...todos];
+		todos[index] = todo;
+		setTodos(newTodos);
+	}
+	
+	function itemTextChange(text) {
+		setItemText(text || null);
+	}
+	
+	return html`
+		<div class="app">
+			<${Header} name="ToDo's (${page})" />
+			<ul>
+				${todos.map((todo, index) => html`
+					<li key=${todo} class=${todo.done ? 'done' : ''} onClick=${() => toggleTodo(todo, index)}>${todo.text}</li>
+				`)}
+			</ul>
+			<input type="text" value=${itemText} placeholder="Your item text here" onChange=${({ target: { value: text } }) => itemTextChange(text.trim())}/>
+			<button onClick=${() => addTodo(itemText ?? undefined)}>Add Todo</button>
+			<${Footer}>footer content here<//>
+		</div>
+	`;
+}
+
+const Header = ({ name }) => html`<h1>${name} List</h1>`
+
+const Footer = props => html`<footer ...${props} />`
+
+render(html`<${App} page="All" />`, document.body);
+</script>
+</body>
+</html>
